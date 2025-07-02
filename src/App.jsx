@@ -1,5 +1,8 @@
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
-import React, { useState, useEffect } from "react";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -16,6 +19,7 @@ import {
   arrayUnion
 } from "firebase/firestore";
 
+// ✅ Use Vercel environment variables
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -117,29 +121,45 @@ function App() {
 
   if (!user) {
     return (
-      <div>
-        <h2>Log in to view your dashboard</h2>
-        <input
+      <div className="p-6 space-y-4">
+        <h2 className="text-xl font-bold">Log in to view your dashboard</h2>
+        <Input
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-        /><br/>
-        <input
+        />
+        <Input
           placeholder="Password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-        /><br/>
-        <button onClick={login}>Log In / Sign Up</button>
+        />
+        <Button onClick={login}>Log In / Sign Up</Button>
       </div>
     );
   }
 
   return (
-    <div>
-      <h2>Welcome, {user.email}</h2>
-      <button onClick={openCheckout}>Upgrade to Premium</button>
-      {/* Add more of your app UI here */}
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Welcome, {user.email}</h2>
+      <Button onClick={openCheckout} className="mb-6">Upgrade to Premium</Button>
+
+      <div className="space-y-4">
+        <h3 className="font-semibold">Download History</h3>
+        {downloadHistory.map((clip, idx) => (
+          <div key={idx} className="border rounded p-2">
+            <p>Type: {clip.type}</p>
+            <p>Time: {clip.timestamp}</p>
+            <a href={clip.downloadUrl} download>⬇ Download</a>
+          </div>
+        ))}
+        {exportStatus && (
+          <>
+            <p>{exportStatus}</p>
+            <Progress value={exportProgress} />
+          </>
+        )}
+      </div>
     </div>
   );
 }
